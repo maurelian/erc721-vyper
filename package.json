@@ -1,0 +1,39 @@
+{
+  "name": "eip721-vyper",
+  "version": "0.0.1",
+  "description": "Vyper implementation of the EIP721 Non-Fungible Token standard.",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "compile:sol": "truffle compile",
+    "compile:vyper": "truper",
+    "compile": "npm run compile:sol && npm run compile:vyper",
+    "console": "truffle console",
+    "lint": "eslint './**/*.js?(x)'",
+    "migrate": "truffle migrate",
+    "networks": "truffle networks",
+    "test": "npm run compile:vyper && truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    ""
+  ],
+  "author": "maurelian",
+  "license": "MIT",
+  "bugs": {
+    "url": ""
+  },
+  "homepage": "",
+  "dependencies": {
+    "ethjs-util": "^0.1.6"
+  },
+  "devDependencies": {
+    "eslint": "4.19.1",
+    "truffle": "4.1.11",
+    "truper": "0.0.2"
+  }
+}
