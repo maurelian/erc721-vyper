@@ -1,5 +1,6 @@
 # @dev Implementation of ERC-721 non-fungible token standard.
 # This vyper file combines the functionality of NFToken.sol and NFTokenMock.sol for testing.
+Data: event({_data: bytes[2048]})
 
 # @dev Emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are
 # created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any
@@ -164,8 +165,7 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
   self._doTransfer(_from, _to, _tokenId)
   if(_to.codesize > 0):
-    # provide 2300 gas similar to solidity's `send()/transfer()` stipend
-    returnValue: bytes[4] = raw_call(_to, '\xf0\xb9\xe5\xba', outsize=4, gas=2300)
+    returnValue: bytes[4] = raw_call(_to, '\xf0\xb9\xe5\xba', outsize=4, gas=msg.gas)
     assert returnValue == '\xf0\xb9\xe5\xba'
 
 # @dev Set or reaffirm the approved address for an NFT.

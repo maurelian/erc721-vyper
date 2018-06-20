@@ -6,14 +6,14 @@
     "test": "test"
   },
   "scripts": {
-    "compile:sol": "truffle compile",
-    "compile:vyper": "truper",
-    "compile": "npm run compile:sol && npm run compile:vyper",
+    "build:sol": "truffle compile",
+    "build:vyper": "truper",
+    "build": "npm run build:sol && npm run build:vyper",
     "console": "truffle console",
     "lint": "eslint './**/*.js?(x)'",
     "migrate": "truffle migrate",
     "networks": "truffle networks",
-    "test": "npm run compile:vyper && truffle test"
+    "test": "truffle test"
   },
   "repository": {
     "type": "git",
