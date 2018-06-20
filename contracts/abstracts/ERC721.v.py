@@ -35,8 +35,8 @@ def balanceOf(_owner: address) -> (uint256):
 # function ownerOf(uint256 _tokenId) external view returns(address);
 @public
 @constant
-def ownerOf(_tokenId: uint256) -> (address):
-  return 0x1111111111111111111111111111111111111111 ## placeholder
+def ownerOf(_tokenId: uint256) -> address
+
 
 # @dev Transfers the ownership of an NFT from one address to another address.
 # @notice Throws unless `msg.sender` is the current owner, an authorized operator, or the
