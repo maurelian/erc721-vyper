@@ -5,7 +5,7 @@ Due to differences between Solidity and Vyper, decisions needed to be made in th
 * Vyper lacks support for inheritance, or any form of import, thus: 
   * All functionality needed to be included in a single file.
   * Although there is no ability to inherit from an unimplemented `interface`, for the sake of the excercise, I created 'minimal' implementations (see ./contracts/ERC721.v.py and ./contracts/SupportsInterface.v.py) which do the least amount of work required by the compiler to accept and return the correct types. 
-* ERC721's `safeTransferFrom()` function takes additional data with no specified format, which sent in a call to the token receiver. Since vyper does not have a dynamically sized bytes arrays like Solidity's `bytes`, I've used `bytes[164]` (4-byte identifier, plus 5 * 32).
+* ERC721's `safeTransferFrom()` function takes additional data with no specified format, which sent in a call to the token receiver. Since vyper does not have a dynamically sized bytes arrays like Solidity's `bytes`, I've used `bytes[1024]` as it's "probably more than you need". 
 
 ## Other Vyper items:
 

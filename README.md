@@ -1,5 +1,7 @@
 # ERC721 Vyper implementation
 
+This is an implementation of the [ERC721](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-721.md) specification in Vyper. It was done as a learning excercise, and **has not been audited.** Moreover, due to certain limitations of Vyper (see TODOs below), the implementation doesn't yet comply with the specification. 
+
 ## Setup
 
 `npm i`
@@ -18,10 +20,9 @@ See the [Vyper installation instructions](https://vyper.readthedocs.io/en/latest
 
 ## TODOs
 
-[] Remove the mint()/burn() functions. Satisfy testing requirements by 'minting' during initialization.
-[] Implement the `safeTransfer()` function with data. (Dependent on adding [default parameter values in vyper](https://github.com/ethereum/vyper/issues/903))
-[] Add the erc721 MetaData interface
-[] Check the validity of my `onERC721Received()` function
+- [ ] Remove the mint()/burn() functions. Satisfy testing requirements by 'minting' during initialization.
+- [ ] Implement the `safeTransfer()` function with data. (Dependent on adding [default parameter values in vyper](https://github.com/ethereum/vyper/issues/903))
+- [ ] Add the erc721 MetaData interface
 
 
 ## Acknowledgements
