@@ -58,14 +58,26 @@ ownerToOperators: (bool[address])[address]
 # mapping(bytes4 => bool) internal supportedInterfaces;
 supportedInterfaces: bool[bytes[4]]
 
-# @dev Contract constructor.
+
+# mintList: {
+#     recipient: address,
+#     tokenId: uint256
+# }[uint256]
+
+# @dev Contract constructor. Per the Transfer event spec; during contract creation, any number of 
+# NFTs may be created and assigned without emitting Transfer.
 @public
-def __init__():
+def __init__(_recipients: address[64], _tokenIds: uint256[64]):
   # ERC721 interface ID:
   self.supportedInterfaces['\x80\xac\x58\xcd'] = True
-  # ERC721-metadata interface ID:
+  # ERC721-metadata interface ID not yet implemented
   # self.supportedInterfaces['\x5b\x5e\x13\x9f'] = True
-  
+  for i in range(64):
+    # stop as soon as there is a non-specified recipient
+    if(_recipients[i] == 0x0000000000000000000000000000000000000000):
+      return
+    self.idToOwner[_tokenIds[i]] = _recipients[i]
+    self.ownerToNFTokenCount[_recipients[i]] += 1
 
 # @dev Function to check which interfaces are suported by this contract.
 # @param _interfaceID Id of the interface.

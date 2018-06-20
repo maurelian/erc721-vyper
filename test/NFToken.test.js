@@ -10,10 +10,11 @@ contract('NFTokenMock', (accounts) => {
   const id4 = 40;
 
   beforeEach(async () => {
-    nftoken = await NFToken.new();
+    // nftoken = await NFToken.new();
   });
 
   it('correctly checks all the supported interfaces', async () => {
+    nftoken = await NFToken.new(['0x0'],[0]);
     const nftokenInterface = await nftoken.supportsInterface('0x80ac58cd');
     const nftokenNonExistingInterface = await nftoken.supportsInterface('0x5b5e139f');
     assert.equal(nftokenInterface, true);
@@ -21,27 +22,15 @@ contract('NFTokenMock', (accounts) => {
   });
 
   it('returns correct balanceOf after mint', async () => {
-    await nftoken.mint(accounts[0], id1);
+    // await nftoken.mint(accounts[0], id1);
+    nftoken = await NFToken.new([accounts[0]], [id1]);
     const count = await nftoken.balanceOf(accounts[0]);
     assert.equal(count.toNumber(), 1);
   });
 
-  it('throws when trying to mint 2 NFTs with the same claim', async () => {
-    await nftoken.mint(accounts[0], id2);
-    await assertRevert(nftoken.mint(accounts[0], id2));
-  });
-
-  it('throws trying to mint NFT with empty claim', async () => {
-    await assertRevert(nftoken.mint(accounts[0], ''));
-  });
-
-  it('throws when trying to mint NFT to 0x0 address ', async () => {
-    await assertRevert(nftoken.mint('0', id3));
-  });
-
   it('finds the correct amount of NFTs owned by account', async () => {
-    await nftoken.mint(accounts[1], id2);
-    await nftoken.mint(accounts[1], id3);
+    nftoken = await nftoken.new([accounts[1], accounts[1]], [id2, id3]);
+    // await nftoken.mint(accounts[1], id3);
     const count = await nftoken.balanceOf(accounts[1]);
     assert.equal(count.toNumber(), 2);
   });
@@ -51,7 +40,7 @@ contract('NFTokenMock', (accounts) => {
   });
 
   it('finds the correct owner of NFToken id', async () => {
-    await nftoken.mint(accounts[1], id2);
+    nftoken = await nftoken.new([accounts[1]], [id2]);
     const address = await nftoken.ownerOf(id2);
     assert.equal(address, accounts[1]);
   });
