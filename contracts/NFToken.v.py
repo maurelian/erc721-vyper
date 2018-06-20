@@ -1,6 +1,11 @@
 # @dev Implementation of ERC-721 non-fungible token standard.
 # This vyper file combines the functionality of NFToken.sol and NFTokenMock.sol for testing.
-Data: event({_data: bytes[2048]})
+
+# Interface for the contract called by safeTransferFrom()
+contract NFTReceiver:
+  # def onERC721Received(_operator: address, _from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32: constant
+  def onERC721Received(_from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32: constant
+
 
 # @dev Emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are
 # created (`from` == 0) and destroyed (`to` == 0). Exception: during contract creation, any
@@ -67,7 +72,7 @@ def __init__():
 # @param _interfaceID Id of the interface.
 @public
 @constant
-def supportsInterface(_interfaceID: bytes[4]) -> (bool):
+def supportsInterface(_interfaceID: bytes[4]) -> bool:
   return self.supportedInterfaces[_interfaceID]
 
 
@@ -77,17 +82,17 @@ def supportsInterface(_interfaceID: bytes[4]) -> (bool):
 # @param _owner Address for whom to query the balance.
 @public
 @constant
-def balanceOf(_owner: address) -> (uint256):
+def balanceOf(_owner: address) -> uint256:
   assert _owner != 0x0000000000000000000000000000000000000000
   return self.ownerToNFTokenCount[_owner]
 
 
 # @dev Returns the address of the owner of the NFT. NFTs assigned to zero address are considered
-# invalid, and queries about them do throw.
+# invalid, and queries about them do throw. 
 # @param _tokenId The identifier for an NFT.
 @public
 @constant
-def ownerOf(_tokenId: uint256) -> (address):
+def ownerOf(_tokenId: uint256) -> address:
   assert self.idToOwner[_tokenId] != 0x0000000000000000000000000000000000000000
   return self.idToOwner[_tokenId]
 
@@ -136,23 +141,8 @@ def _doTransfer(_from: address, _to: address, _tokenId: uint256):
 @public
 def transferFrom(_from: address, _to: address, _tokenId: uint256):
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
-  self._doTransfer(_from, _to, _tokenId)
+  self._doTransfer(_from, _to, _tokenId)  
 
-# @dev Transfers the ownership of an NFT from one address to another address.
-# @notice Throws unless `msg.sender` is the current owner, an authorized operator, or the
-# approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
-# the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
-# function checks if `_to` is a smart contract (code size > 0). If so, it calls `onERC721Received`
-# on `_to` and throws if the return value is not `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
-# @param _from The current owner of the NFT.
-# @param _to The new owner.
-# @param _tokenId The NFT to transfer.
-# @param _data Additional data with no specified format, sent in call to `_to`.
-# @public
-# def safeTransferFrom(_from: address, _to: address, _tokenId: uint256, _data: bytes[164]):
-# Note: This function is cannot be implemented in vyper, as it lacks function overloading. 
-#   It is also untested in the original test suite from the 0xcert repo
-  
 
 # @dev Transfers the ownership of an NFT from one address to another address.
 # @notice This works identically to the other function with an extra data parameter, except this
@@ -165,8 +155,26 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
   self._doTransfer(_from, _to, _tokenId)
   if(_to.codesize > 0):
-    returnValue: bytes[4] = raw_call(_to, '\xf0\xb9\xe5\xba', outsize=4, gas=msg.gas)
-    assert returnValue == '\xf0\xb9\xe5\xba'
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_to, _tokenId, '\xf0\xb9\xe5\xba')
+    assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
+
+# @dev Transfers the ownership of an NFT from one address to another address.
+# @notice Throws unless `msg.sender` is the current owner, an authorized operator, or the
+# approved address for this NFT. Throws if `_from` is not the current owner. Throws if `_to` is
+# the zero address. Throws if `_tokenId` is not a valid NFT. When transfer is complete, this
+# function checks if `_to` is a smart contract (code size > 0). If so, it calls `onERC721Received`
+# on `_to` and throws if the return value is not `bytes4(keccak256("onERC721Received(address,uint256,bytes)"))`.
+# @param _from The current owner of the NFT.
+# @param _to The new owner.
+# @param _tokenId The NFT to transfer.
+# @param _data Additional data with no specified format, sent in call to `_to`.
+@public
+def safeTransferFromWithData(_from: address, _to: address, _tokenId: uint256, _data: bytes[164]):
+# Note: This function should be named `safeTransferFrom()` per erc721. But overloading is not 
+#   allowed  cannot be implemented vyper. Default values will soon enable support for this.
+  log.Transfer(_from, _to, _tokenId)
+
+  
 
 # @dev Set or reaffirm the approved address for an NFT.
 # @notice The zero address indicates there is no approved address. Throws unless `msg.sender` is
@@ -201,7 +209,7 @@ def setApprovalForAll(_operator: address, _approved: bool):
 # @param _tokenId ID of the NFT to query the approval of.
 @public
 @constant
-def getApproved(_tokenId: uint256) -> (address):
+def getApproved(_tokenId: uint256) -> address:
   assert self.idToOwner[_tokenId] != 0x0000000000000000000000000000000000000000
   return self.idToApprovals[_tokenId]
 
@@ -210,7 +218,7 @@ def getApproved(_tokenId: uint256) -> (address):
 # @param _operator The address that acts on behalf of the owner.
 @public 
 @constant
-def isApprovedForAll( _owner: address, _operator: address) -> (bool):
+def isApprovedForAll( _owner: address, _operator: address) -> bool:
   # TODO: check original for _owner == 0x0
   if (_owner == 0x0000000000000000000000000000000000000000):
     return False

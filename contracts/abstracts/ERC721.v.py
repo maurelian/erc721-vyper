@@ -27,7 +27,7 @@ ApprovalForAll: event({_owner: indexed(address), _operator: indexed(address), _a
 @public # external not available in vyper
 @constant
 def balanceOf(_owner: address) -> (uint256):
-  return 1 ## placeholder 
+  return 1
 
 # @dev Returns the address of the owner of the NFT. NFTs assigned to zero address are considered
 # invalid, and queries about them do throw.
@@ -35,7 +35,8 @@ def balanceOf(_owner: address) -> (uint256):
 # function ownerOf(uint256 _tokenId) external view returns(address);
 @public
 @constant
-def ownerOf(_tokenId: uint256) -> address
+def ownerOf(_tokenId: uint256) -> address:
+  return 0x1111111111111111111111111111111111111111
 
 
 # @dev Transfers the ownership of an NFT from one address to another address.

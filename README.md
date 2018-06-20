@@ -16,6 +16,13 @@ A truffle compatible build process is handled by [`truper`](https://www.npmjs.co
 
 See the [Vyper installation instructions](https://vyper.readthedocs.io/en/latest/installing-vyper.html).
 
+## TODOs
+
+[] Remove the mint()/burn() functions. Satisfy testing requirements by 'minting' during initialization.
+[] Implement the `safeTransfer()` function with data. (Dependent on adding [default parameter values in vyper](https://github.com/ethereum/vyper/issues/903))
+[] Add the erc721 MetaData interface
+[] Check the validity of my `onERC721Received()` function
+
 
 ## Acknowledgements
 

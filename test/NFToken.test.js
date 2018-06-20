@@ -1,4 +1,3 @@
-// const NFToken = artifacts.require('NFTokenMock');
 const NFToken = artifacts.require('NFToken.vyper');
 const assertRevert = require('./helpers/assertRevert');
 const TokenReceiverMock = artifacts.require('NFTokenReceiverTestMock');
@@ -257,39 +256,13 @@ contract('NFTokenMock', (accounts) => {
 
   it('corectly safe transfers NFT from owner to smart contract that can recieve NFTs', async () => {
     const sender = accounts[1];
-    const tokenReceiverMock = await TokenReceiverMock.new();
+    const tokenReceiverMock = await TokenReceiverMockVyper.new();
     const recipient = tokenReceiverMock.address;
 
     await nftoken.mint(sender, id2);
     const { logs } = await nftoken.safeTransferFrom(sender, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
-    const dataEvent = logs.find(e => e.event === 'Data');
-    // console.log(dataEvent)
     assert.notEqual(transferEvent, undefined);
-
-    const senderBalance = await nftoken.balanceOf(sender);
-    const recipientBalance = await nftoken.balanceOf(recipient);
-    const ownerOfId2 =  await nftoken.ownerOf(id2);
-
-    assert.equal(senderBalance, 0);
-    assert.equal(recipientBalance, 1);
-    assert.equal(ownerOfId2, recipient);
-  });
-
-  it('Vyper: corectly safe transfers NFT from owner to smart contract that can recieve NFTs', async () => {
-    const sender = accounts[1];
-    const tokenReceiverMockVyper = await TokenReceiverMockVyper.new();
-    const recipient = tokenReceiverMockVyper.address;
-
-    await nftoken.mint(sender, id2);
-    const tx = await nftoken.safeTransferFrom(sender, recipient, id2, {from: sender});
-    const {logs} = tx;
-    // console.log( tx)
-    // await new Promise(web3.eth.getTransactionReceipt(tx))
-    const transferEvent = logs.find(e => e.event === 'Transfer');
-    const dataEvent = logs.find(e => e.event === 'Data');
-    assert.notEqual(transferEvent, undefined);
-    // console.log(dataEvent)
 
     const senderBalance = await nftoken.balanceOf(sender);
     const recipientBalance = await nftoken.balanceOf(recipient);
