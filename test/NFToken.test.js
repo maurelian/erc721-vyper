@@ -1,6 +1,5 @@
 const NFToken = artifacts.require('NFToken.vyper');
 const assertRevert = require('./helpers/assertRevert');
-const TokenReceiverMock = artifacts.require('NFTokenReceiverTestMock');
 const TokenReceiverMockVyper = artifacts.require('NFTokenReceiverTestMock.vyper');
 
 contract('NFTokenMock', (accounts) => {
@@ -227,7 +226,7 @@ contract('NFTokenMock', (accounts) => {
 
   it('corectly safe transfers NFT from owner to smart contract that can recieve NFTs', async () => {
     const sender = accounts[1];
-    const tokenReceiverMock = await TokenReceiverMock.new();
+    const tokenReceiverMock = await TokenReceiverMockVyper.new();
     const recipient = tokenReceiverMock.address;
 
     await nftoken.mint(sender, id2);

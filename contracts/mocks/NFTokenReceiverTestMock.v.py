@@ -13,6 +13,6 @@
 
 InputData: event({_data: bytes[1024]})
 
-@public 
+@public
 def onERC721Received(_operator: address, _from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32:
   return 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000

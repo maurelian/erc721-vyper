@@ -3,8 +3,7 @@
 
 # Interface for the contract called by safeTransferFrom()
 contract NFTReceiver:
-  # def onERC721Received(_operator: address, _from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32: constant
-  def onERC721Received(_from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32: constant
+  def onERC721Received(_operator: address, _from: address ,_tokenId: uint256, _data: bytes[1028]) -> bytes32: constant
 
 
 # @dev Emits when ownership of any NFT changes by any mechanism. This event emits when NFTs are
@@ -155,7 +154,7 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
   self._doTransfer(_from, _to, _tokenId)
   if(_to.codesize > 0):
-    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_to, _tokenId, '\xf0\xb9\xe5\xba')
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(0x0000000000000000000000000000000000000000, _from, _tokenId, '\xf0\xb9\xe5\xba')
     assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
 
 # @dev Transfers the ownership of an NFT from one address to another address.
