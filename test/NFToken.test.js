@@ -9,55 +9,51 @@ contract('NFTokenMock', (accounts) => {
   const id3 = 3;
   const id4 = 40;
 
-  beforeEach(async () => {
-    // nftoken = await NFToken.new();
-  });
-
   it('correctly checks all the supported interfaces', async () => {
-    nftoken = await NFToken.new(['0x0'],[0]);
+    nftoken = await NFToken.new([],[], {gas: 6000000});
     const nftokenInterface = await nftoken.supportsInterface('0x80ac58cd');
     const nftokenNonExistingInterface = await nftoken.supportsInterface('0x5b5e139f');
     assert.equal(nftokenInterface, true);
     assert.equal(nftokenNonExistingInterface, false);
   });
 
-  it('returns correct balanceOf after mint', async () => {
-    // await nftoken.mint(accounts[0], id1);
+  it('returns correct balanceOf after init', async () => {
     nftoken = await NFToken.new([accounts[0]], [id1]);
     const count = await nftoken.balanceOf(accounts[0]);
     assert.equal(count.toNumber(), 1);
   });
 
   it('finds the correct amount of NFTs owned by account', async () => {
-    nftoken = await nftoken.new([accounts[1], accounts[1]], [id2, id3]);
-    // await nftoken.mint(accounts[1], id3);
+    nftoken = await NFToken.new([accounts[1], accounts[1]], [id2, id3]);
     const count = await nftoken.balanceOf(accounts[1]);
     assert.equal(count.toNumber(), 2);
   });
 
   it('throws when trying to get count of NFTs owned by 0x0 address', async () => {
+    nftoken = await NFToken.new([],[])
     await assertRevert(nftoken.balanceOf('0'));
   });
 
   it('finds the correct owner of NFToken id', async () => {
-    nftoken = await nftoken.new([accounts[1]], [id2]);
+    nftoken = await NFToken.new([accounts[1]], [id2]);
     const address = await nftoken.ownerOf(id2);
     assert.equal(address, accounts[1]);
   });
 
-  it('throws when trying to find owner od non-existing NFT id', async () => {
+  it('throws when trying to find owner of non-existing NFT id', async () => {
+    nftoken = await NFToken.new([],[])
     await assertRevert(nftoken.ownerOf(id4));
   });
 
   it('correctly approves account', async () => {
-    await nftoken.mint(accounts[0], id2);
+    nftoken = await NFToken.new([accounts[0]], [id2]);
     await nftoken.approve(accounts[1], id2);
     const address = await nftoken.getApproved(id2);
     assert.equal(address, accounts[1]);
   });
 
   it('correctly cancels approval of account[1]', async () => {
-    await nftoken.mint(accounts[0], id2);
+    nftoken = await NFToken.new([accounts[0]], [id2]);
     await nftoken.approve(accounts[1], id2);
     await nftoken.approve(0, id2);
     const address = await nftoken.getApproved(id2);
@@ -70,21 +66,21 @@ contract('NFTokenMock', (accounts) => {
 
 
   it('throws when trying to approve NFT ID which it does not own', async () => {
-    await nftoken.mint(accounts[1], id2);
+    nftoken = await NFToken.new([accounts[1]], [id2]);
     await assertRevert(nftoken.approve(accounts[2], id2, {from: accounts[2]}));
     const address = await nftoken.getApproved(id2);
     assert.equal(address, 0);
   });
 
   it('throws when trying to approve NFT ID which it already owns', async () => {
-    await nftoken.mint(accounts[1], id2);
+    nftoken = await NFToken.new([accounts[1]], [id2]);
     await assertRevert(nftoken.approve(accounts[1], id2));
     const address = await nftoken.getApproved(id2);
     assert.equal(address, 0);
   });
 
   it('correctly sets an operator', async () => {
-    await nftoken.mint(accounts[0], id2);
+    nftoken = await NFToken.new([accounts[0]], [id2]);
     const { logs } = await nftoken.setApprovalForAll(accounts[6], true);
     const approvalForAllEvent = logs.find(e => e.event === 'ApprovalForAll');
     assert.notEqual(approvalForAllEvent, undefined);
@@ -93,7 +89,7 @@ contract('NFTokenMock', (accounts) => {
   });
 
   it('correctly sets then cancels an operator', async () => {
-    await nftoken.mint(accounts[0], id2);
+    nftoken = await NFToken.new([accounts[0]], [id2]);
     await nftoken.setApprovalForAll(accounts[6], true);
     await nftoken.setApprovalForAll(accounts[6], false);
 
@@ -109,7 +105,7 @@ contract('NFTokenMock', (accounts) => {
     const sender = accounts[1];
     const recipient = accounts[2];
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     const { logs } = await nftoken.transferFrom(sender, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
     assert.notEqual(transferEvent, undefined);
@@ -128,7 +124,7 @@ contract('NFTokenMock', (accounts) => {
     const recipient = accounts[2];
     const owner = accounts[3];
 
-    await nftoken.mint(owner, id2);
+    nftoken = await NFToken.new([owner], [id2]);
     await nftoken.approve(sender, id2, {from: owner});
     const { logs } = await nftoken.transferFrom(owner, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
@@ -148,7 +144,7 @@ contract('NFTokenMock', (accounts) => {
     const recipient = accounts[2];
     const owner = accounts[3];
 
-    await nftoken.mint(owner, id2);
+    nftoken = await NFToken.new([owner], [id2]);
     await nftoken.setApprovalForAll(sender, true, {from: owner});
     const { logs } = await nftoken.transferFrom(owner, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
@@ -168,14 +164,14 @@ contract('NFTokenMock', (accounts) => {
     const recipient = accounts[2];
     const owner = accounts[3];
 
-    await nftoken.mint(owner, id2);
+    nftoken = await NFToken.new([owner], [id2]);
     await assertRevert(nftoken.transferFrom(owner, recipient, id2, {from: sender}));
   });
 
   it('throws when trying to transfer NFT to a zero address', async () => {
     const owner = accounts[3];
 
-    await nftoken.mint(owner, id2);
+    nftoken = await NFToken.new([owner], [id2]);
     await assertRevert(nftoken.transferFrom(owner, 0, id2, {from: owner}));
   });
 
@@ -183,7 +179,7 @@ contract('NFTokenMock', (accounts) => {
     const owner = accounts[3];
     const recipient = accounts[2];
 
-    await nftoken.mint(owner, id2);
+    nftoken = await NFToken.new([owner], [id2]);
     await assertRevert(nftoken.transferFrom(owner, recipient, id3, {from: owner}));
   });
 
@@ -191,7 +187,7 @@ contract('NFTokenMock', (accounts) => {
     const sender = accounts[1];
     const recipient = accounts[2];
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     const { logs } = await nftoken.safeTransferFrom(sender, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
     assert.notEqual(transferEvent, undefined);
@@ -209,7 +205,7 @@ contract('NFTokenMock', (accounts) => {
     const sender = accounts[1];
     const recipient = nftoken.address;
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     await assertRevert(nftoken.safeTransferFrom(sender, recipient, id2, {from: sender}));
   });
 
@@ -218,11 +214,9 @@ contract('NFTokenMock', (accounts) => {
     const tokenReceiverMock = await TokenReceiverMockVyper.new();
     const recipient = tokenReceiverMock.address;
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     const { logs } = await nftoken.safeTransferFrom(sender, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
-    const dataEvent = logs.find(e => e.event === 'Data');
-    // console.log(dataEvent)
     assert.notEqual(transferEvent, undefined);
 
     const senderBalance = await nftoken.balanceOf(sender);
@@ -238,7 +232,7 @@ contract('NFTokenMock', (accounts) => {
     const sender = accounts[1];
     const recipient = nftoken.address;
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     await assertRevert(nftoken.safeTransferFrom(sender, recipient, id2, {from: sender}));
   });
 
@@ -247,7 +241,7 @@ contract('NFTokenMock', (accounts) => {
     const tokenReceiverMock = await TokenReceiverMockVyper.new();
     const recipient = tokenReceiverMock.address;
 
-    await nftoken.mint(sender, id2);
+    nftoken = await NFToken.new([sender], [id2]);
     const { logs } = await nftoken.safeTransferFrom(sender, recipient, id2, {from: sender});
     const transferEvent = logs.find(e => e.event === 'Transfer');
     assert.notEqual(transferEvent, undefined);
@@ -262,7 +256,7 @@ contract('NFTokenMock', (accounts) => {
   });
 
   it('corectly burns a NFT', async () => {
-    await nftoken.mint(accounts[1], id2);
+    nftoken = await NFToken.new([accounts[1]], [id2]);
     const { logs } = await nftoken.burn(accounts[1], id2);
     const transferEvent = logs.find(e => e.event === 'Transfer');
     assert.notEqual(transferEvent, undefined);
@@ -271,9 +265,5 @@ contract('NFTokenMock', (accounts) => {
     assert.equal(balance, 0);
 
     await assertRevert(nftoken.ownerOf(id2));
-  });
-
-  it('throws when trying to burn non existant NFT', async () => {
-    await assertRevert(nftoken.burn(accounts[1], id2));
   });
 });

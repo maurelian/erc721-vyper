@@ -74,8 +74,8 @@ def __init__(_recipients: address[64], _tokenIds: uint256[64]):
   # self.supportedInterfaces['\x5b\x5e\x13\x9f'] = True
   for i in range(64):
     # stop as soon as there is a non-specified recipient
-    if(_recipients[i] == 0x0000000000000000000000000000000000000000):
-      return
+    # if(_recipients[i] == 0x0000000000000000000000000000000000000000):
+    #   return
     self.idToOwner[_tokenIds[i]] = _recipients[i]
     self.ownerToNFTokenCount[_recipients[i]] += 1
 
@@ -165,8 +165,10 @@ def transferFrom(_from: address, _to: address, _tokenId: uint256):
 def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
   self._doTransfer(_from, _to, _tokenId)
+  _operator: address = 0x0000000000000000000000000000000000000000
+  # if(msg.sender != _to)
   if(_to.codesize > 0):
-    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(0x0000000000000000000000000000000000000000, _from, _tokenId, '\xf0\xb9\xe5\xba')
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '\xf0\xb9\xe5\xba')
     assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
 
 # @dev Transfers the ownership of an NFT from one address to another address.
@@ -183,7 +185,13 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
 def safeTransferFromWithData(_from: address, _to: address, _tokenId: uint256, _data: bytes[164]):
 # Note: This function should be named `safeTransferFrom()` per erc721. But overloading is not 
 #   allowed  cannot be implemented vyper. Default values will soon enable support for this.
-  log.Transfer(_from, _to, _tokenId)
+  self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
+  self._doTransfer(_from, _to, _tokenId)
+  _operator: address = 0x0000000000000000000000000000000000000000
+  sendData: bytes[1028] = concatenate('\xf0\xb9\xe5\xba', _data)
+  if(_to.codesize > 0):
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '\xf0\xb9\xe5\xba')
+    assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
 
   
 
@@ -234,21 +242,3 @@ def isApprovedForAll( _owner: address, _operator: address) -> bool:
   if (_owner == 0x0000000000000000000000000000000000000000):
     return False
   return (self.ownerToOperators[_owner])[_operator]
-
-### Non-standard functions ###
-
-# These functions are not part of erc721, but are used in the test suite
-@public
-def mint(_to: address, _tokenId: uint256):
-  assert self.idToOwner[_tokenId] == 0x0000000000000000000000000000000000000000
-  assert _to != 0x0000000000000000000000000000000000000000
-  assert _tokenId != 0
-  self.idToOwner[_tokenId] = _to
-  self.ownerToNFTokenCount[_to] += 1
-  log.Transfer(0x0000000000000000000000000000000000000000, _to, _tokenId)
-
-@public
-def burn(_owner: address, _tokenId: uint256):
-  assert self.idToOwner[_tokenId] != 0x0000000000000000000000000000000000000000
-  self._doTransfer(_owner, 0x0000000000000000000000000000000000000000, _tokenId)
-  log.Transfer(_owner, 0x0000000000000000000000000000000000000000, _tokenId)
