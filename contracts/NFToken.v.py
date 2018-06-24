@@ -168,7 +168,7 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
   _operator: address = 0x0000000000000000000000000000000000000000
   # if(msg.sender != _to)
   if(_to.codesize > 0):
-    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '\xf0\xb9\xe5\xba')
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '')
     assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
 
 # @dev Transfers the ownership of an NFT from one address to another address.
@@ -182,15 +182,14 @@ def safeTransferFrom(_from: address, _to: address, _tokenId: uint256):
 # @param _tokenId The NFT to transfer.
 # @param _data Additional data with no specified format, sent in call to `_to`.
 @public
-def safeTransferFromWithData(_from: address, _to: address, _tokenId: uint256, _data: bytes[164]):
+def safeTransferFromWithData(_from: address, _to: address, _tokenId: uint256, _data: bytes[1024]):
 # Note: This function should be named `safeTransferFrom()` per erc721. But overloading is not 
 #   allowed  cannot be implemented vyper. Default values will soon enable support for this.
   self._validateTransferFrom(_from, _to, _tokenId, msg.sender)
   self._doTransfer(_from, _to, _tokenId)
   _operator: address = 0x0000000000000000000000000000000000000000
-  sendData: bytes[1028] = concatenate('\xf0\xb9\xe5\xba', _data)
   if(_to.codesize > 0):
-    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '\xf0\xb9\xe5\xba')
+    returnValue: bytes32 = NFTReceiver(_to).onERC721Received(_operator, _from, _tokenId, '')
     assert returnValue == 0xf0b9e5ba00000000000000000000000000000000000000000000000000000000
 
   

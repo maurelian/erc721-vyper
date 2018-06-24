@@ -254,16 +254,4 @@ contract('NFTokenMock', (accounts) => {
     assert.equal(recipientBalance, 1);
     assert.equal(ownerOfId2, recipient);
   });
-
-  it('corectly burns a NFT', async () => {
-    nftoken = await NFToken.new([accounts[1]], [id2]);
-    const { logs } = await nftoken.burn(accounts[1], id2);
-    const transferEvent = logs.find(e => e.event === 'Transfer');
-    assert.notEqual(transferEvent, undefined);
-
-    const balance = await nftoken.balanceOf(accounts[1]);
-    assert.equal(balance, 0);
-
-    await assertRevert(nftoken.ownerOf(id2));
-  });
 });
