@@ -20,9 +20,10 @@ See the [Vyper installation instructions](https://vyper.readthedocs.io/en/latest
 
 ## TODOs
 
-- [ ] Remove the mint()/burn() functions. Satisfy testing requirements by 'minting' during initialization.
-- [ ] Implement the `safeTransfer()` function with data. (Dependent on adding [default parameter values in vyper](https://github.com/ethereum/vyper/issues/903))
+- [ ] Implement the `safeTransfer()` function with data. (Dependent on adding [default parameter values in vyper](https://github.com/ethereum/vyper/issues/903)). Currently it is implemented but named `safeTransferWithData()`. 
+- [ ] Add a test for the ability to send from `safeTransferWithData()`
 - [ ] Add the erc721 MetaData interface
+- [ ] Add the erc721 Enumberable interface
 
 
 ## Acknowledgements
